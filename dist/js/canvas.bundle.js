@@ -113,7 +113,7 @@ var mouse = {
     y: 10
 };
 
-var colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66'];
+var colors = ['#2185C5', '#7ECEFD', '#0eabdd', '#FF7F66'];
 
 // Event Listeners
 addEventListener('mousemove', function (event) {
@@ -133,17 +133,23 @@ function Particle(x, y, radius, color) {
     this.x = x;
     this.y = y;
     this.velocity = {
-        x: Math.random() - 0.5,
-        y: Math.random() - 0.5
+        x: (Math.random() - 0.5) * 5,
+        y: (Math.random() - 0.5) * 5
     };
     this.radius = radius;
     this.color = color;
     this.mass = 1;
+    this.opacity = 0;
 }
 
 Object.prototype.draw = function () {
     c.beginPath();
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    c.save();
+    c.globalAlpha = this.opacity;
+    c.fillStyle = this.color;
+    c.fill();
+    c.restore();
     c.strokeStyle = this.color;
     c.stroke();
     c.closePath();
@@ -168,6 +174,14 @@ Object.prototype.update = function (particles) {
         this.velocity.y = -this.velocity.y;
     }
 
+    // mouse collision detection
+    if (_utils2.default.distance(mouse.x, mouse.y, this.x, this.y) < 120 && this.opacity < 0.2) {
+        this.opacity += 0.02;
+    } else if (this.opacity > 0) {
+        this.opacity -= 0.02;
+        this.opacity = Math.max(0, this.opacity);
+    }
+
     this.x += this.velocity.x;
     this.y += this.velocity.y;
 };
@@ -177,11 +191,11 @@ var particles = void 0;
 function init() {
     particles = [];
 
-    for (var i = 0; i < 300; i++) {
+    for (var i = 0; i < 100; i++) {
         var x = _utils2.default.randomIntFromRange(radius, canvas.width - radius);
         var y = _utils2.default.randomIntFromRange(radius, canvas.height - radius);
-        var radius = 20;
-        var color = 'black';
+        var radius = 15;
+        var color = _utils2.default.randomColor(colors);
 
         if (i !== 0) {
             for (var j = 0; j < particles.length; j++) {
